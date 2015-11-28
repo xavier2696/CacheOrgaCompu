@@ -34,8 +34,12 @@ public class Tarea1Cache {
         Linea[] cache_conjunto = new Linea[8];
         for(int i=0; i<8; i++){
             cache_directa[i] = new Linea();
+            cache_directa[i].setEtiqueta(-1);
             cache_asociativa[i] = new Linea();
+            cache_asociativa[i].setEtiqueta(-1);
             cache_conjunto[i]=new Linea();
+            cache_conjunto[i].setEtiqueta(-1);
+            cache_conjunto[i].setBloque(-1);
         }
         //memoria ram
         int[] ram = new int[4096];
@@ -60,6 +64,7 @@ public class Tarea1Cache {
                     escribir(i, tipo,leer(j,tipo,t_directo,ram,cache_directa,siguiente_asociativa,siguiente_conjunto),t_directo,ram,cache_directa,siguiente_asociativa,siguiente_conjunto);
                     escribir(j,tipo,temp,t_directo,ram,cache_directa,siguiente_asociativa,siguiente_conjunto);
                 }
+        
         //sin cache
         
         tipo=0;
@@ -316,7 +321,7 @@ public class Tarea1Cache {
                             if(cache[linea].isModificado()){
                                 //linea de cache a bloque de ram
                                 int b = 0;
-                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                for(int j = cache[linea].getEtiqueta()*m*k; j<cache[linea].getEtiqueta()*m*k; j++){
                                     ram[j] = cache[linea].getDato(b);
                                     b++;
                                 }
@@ -382,7 +387,7 @@ public class Tarea1Cache {
                             if(cache[siguiente_asociativa[0]].isModificado()){
                             //linea de cache a bloque de ram
                                 int b = 0;
-                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                for(int j = cache[siguiente_asociativa[0]].getEtiqueta()*k; j<cache[siguiente_asociativa[0]].getEtiqueta()*k+k; j++){
                                     ram[j] = cache[siguiente_asociativa[0]].getDato(b);
                                     b++;
                                 }
@@ -461,7 +466,7 @@ public class Tarea1Cache {
                             if(cache[siguiente_conjunto[conjunto]].isModificado()){
                             //linea de cache a bloque de ram
                                 int b = 0;
-                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                for(int j = cache[siguiente_conjunto[conjunto]].getBloque()*k; j<cache[siguiente_conjunto[conjunto]].getBloque()*k+k; j++){
                                     ram[j] = cache[siguiente_conjunto[conjunto]].getDato(b);
                                     b++;
                                 }
@@ -469,6 +474,7 @@ public class Tarea1Cache {
                                 
                                 //bloque de ram a linea de cache
                                 cache[siguiente_conjunto[conjunto]].setEtiqueta(etiqueta);
+                                cache[siguiente_conjunto[conjunto]].setBloque(bloque);
                                 int a = 0;
                                 for(int j = k*bloque; j<k*bloque+k; j++){
                                     cache[siguiente_conjunto[conjunto]].setDato(a, ram[j]);
@@ -482,6 +488,7 @@ public class Tarea1Cache {
                         }else{                             
                             //bloque de ram a linea de cache
                             cache[siguiente_conjunto[conjunto]].setEtiqueta(etiqueta);
+                            cache[siguiente_conjunto[conjunto]].setBloque(bloque);
                             int a = 0;
                             for(int j = k*bloque; j<k*bloque+k; j++){
                                 cache[siguiente_conjunto[conjunto]].setDato(a, ram[j]);
@@ -498,6 +505,7 @@ public class Tarea1Cache {
                                 
                                 //bloque de ram a linea de cache
                                 cache[siguiente_conjunto[conjunto]].setEtiqueta(etiqueta);
+                                cache[siguiente_conjunto[conjunto]].setBloque(bloque);
                                 int a = 0;
                                 for(int j = k*bloque; j<k*bloque+k; j++){
                                     cache[siguiente_conjunto[conjunto]].setDato(a, ram[j]);
@@ -509,7 +517,6 @@ public class Tarea1Cache {
                                 //sumar tiempo
                                 tiempo[0] += 11;
                         }
-                        
                         if(siguiente_conjunto[conjunto] == 3){
                             siguiente_conjunto[conjunto] = 0;
                         }else if(siguiente_conjunto[conjunto] == 7){
@@ -526,7 +533,8 @@ public class Tarea1Cache {
                     break;
                 default:
                     break;
-        }        
+        }     
+        
         return retorno;
     }
     
@@ -558,14 +566,14 @@ public class Tarea1Cache {
                             if(cache[linea].isModificado()){
                                 //linea de cache a bloque de ram
                                 int b = 0;
-                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                for(int j = cache[linea].getEtiqueta()*m*k; j<cache[linea].getEtiqueta()*m*k+k; j++){
                                     ram[j] = cache[linea].getDato(b);
                                     b++;
                                 }
                                 //bloque de ram a linea de cache
                                 cache[linea].setEtiqueta(etiqueta);
                                 int a = 0;
-                                for(int j = k*bloque; j<k*bloque+k-1; j++){
+                                for(int j = k*bloque; j<k*bloque+k; j++){
                                     cache[linea].setDato(a, ram[j]);
                                     a++;
                                 }
@@ -591,6 +599,11 @@ public class Tarea1Cache {
                                 tiempo[0] += 11;
                             }
                         }
+                        int c = 0;
+                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                    ram[j] = cache[linea].getDato(c);
+                                    c++;
+                               }
                     }else{
                         cache[linea].setValido(true);
                                                
@@ -607,6 +620,7 @@ public class Tarea1Cache {
                         //sumar tiempo
                         tiempo[0] += 11;
                     }
+                    int c = 0;
                     break;
                 case 2:
                     //etiqueta, palabra y bloque
@@ -621,17 +635,16 @@ public class Tarea1Cache {
                             break;
                         }
                     }
-                    
                     if(linea_asociativa==-1){
                         if(cache[siguiente_asociativa[0]].isValido()){
                             if(cache[siguiente_asociativa[0]].isModificado()){
                             //linea de cache a bloque de ram
                                 int b = 0;
-                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                for(int j = cache[siguiente_asociativa[0]].getEtiqueta()*k; j<cache[siguiente_asociativa[0]].getEtiqueta()*k+k; j++){
                                     ram[j] = cache[siguiente_asociativa[0]].getDato(b);
                                     b++;
                                 }                              
-                                
+                                System.out.println(b);
                                 //bloque de ram a linea de cache
                                 cache[siguiente_asociativa[0]].setEtiqueta(etiqueta);
                                 int a = 0;
@@ -644,7 +657,7 @@ public class Tarea1Cache {
                                 cache[siguiente_asociativa[0]].setDato(palabra, dato);
                                 //sumar tiempo
                                 tiempo[0] += 22;
-                        }else{                             
+                        }else{
                             //bloque de ram a linea de cache
                             cache[siguiente_asociativa[0]].setEtiqueta(etiqueta);
                             int a = 0;
@@ -675,17 +688,28 @@ public class Tarea1Cache {
                         }
                         /*for(int j = 0; j<8; j++){
                             System.out.println(cache[siguiente_asociativa[0]].getDato(j));
-                        }     */               
+                        }     */  
+                        /*c = 0;
+                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                    ram[j] = cache[siguiente_asociativa[0]].getDato(c);
+                                    c++;
+                                }*/
                         if(siguiente_asociativa[0]<7)
                             siguiente_asociativa[0]++;
                         else
                             siguiente_asociativa[0]=0;
+                        
                     }else{
                         cache[linea_asociativa].setModificado(true);
                         //almacenar dato en cache
                         cache[linea_asociativa].setDato(palabra, dato);
                         //sumar tiempo
                         tiempo[0] += 1;
+                        /*c = 0;
+                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                    ram[j] = cache[linea_asociativa].getDato(c);
+                                    c++;
+                                }*/
                     }
                     break;
                 case 3:
@@ -698,7 +722,8 @@ public class Tarea1Cache {
                     linea_asociativa=-1;
                     
                     for(int j=0+4*conjunto; j<4+4*conjunto;j++){
-                            if(cache[j].getEtiqueta()==etiqueta){
+                        //System.out.println(cache[j].getEtiqueta());
+                            if(cache[j].getEtiqueta()==etiqueta ){ 
                                 linea_asociativa=j;
                                 break;
                             }
@@ -708,13 +733,13 @@ public class Tarea1Cache {
                             if(cache[siguiente_conjunto[conjunto]].isModificado()){
                             //linea de cache a bloque de ram
                                 int b = 0;
-                                for(int j = k*bloque; j<k*bloque+k; j++){
+                                for(int j = cache[siguiente_conjunto[conjunto]].getBloque()*k; j<cache[siguiente_conjunto[conjunto]].getBloque()*k+k; j++){
                                     ram[j] = cache[siguiente_conjunto[conjunto]].getDato(b);
                                     b++;
-                                }
-                                                                
+                                }                               
                                 //bloque de ram a linea de cache
                                 cache[siguiente_conjunto[conjunto]].setEtiqueta(etiqueta);
+                                cache[siguiente_conjunto[conjunto]].setBloque(bloque);
                                 int a = 0;
                                 for(int j = k*bloque; j<k*bloque+k; j++){
                                     cache[siguiente_conjunto[conjunto]].setDato(a, ram[j]);
@@ -728,6 +753,7 @@ public class Tarea1Cache {
                         }else{                             
                             //bloque de ram a linea de cache
                             cache[siguiente_conjunto[conjunto]].setEtiqueta(etiqueta);
+                            cache[siguiente_conjunto[conjunto]].setBloque(bloque);
                             int a = 0;
                             for(int j = k*bloque; j<k*bloque+k; j++){
                                 cache[siguiente_conjunto[conjunto]].setDato(a, ram[j]);
@@ -743,6 +769,7 @@ public class Tarea1Cache {
                             cache[siguiente_conjunto[conjunto]].setValido(true);
                              //bloque de ram a linea de cache
                             cache[siguiente_conjunto[conjunto]].setEtiqueta(etiqueta);
+                            cache[siguiente_conjunto[conjunto]].setBloque(bloque);
                             int a = 0;
                             for(int j = k*bloque; j<k*bloque+k; j++){
                                 cache[siguiente_conjunto[conjunto]].setDato(a, ram[j]);

@@ -13,10 +13,20 @@ package tarea1cache;
 public class Linea {
     
     private int etiqueta;
-    private boolean valido;
-    private boolean modificado;
+    private boolean valido=false;
+    private boolean modificado=false;
+    private int bloque;
     private int[] datos = new int[8];
 
+    public int getBloque() {
+        return bloque;
+    }
+
+    public void setBloque(int bloque) {
+        this.bloque = bloque;
+    }
+
+    
     public int[] getDatos() {
         return datos;
     }
